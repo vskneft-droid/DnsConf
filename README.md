@@ -1,6 +1,5 @@
 🌐 Languages: [󠁧󠁢󠁥󠁮󠁧󠁿**English**](README.md) | [**Русский**](README.ru.md)
 
-[![oosmetrics](https://api.oosmetrics.com/api/v1/badge/achievement/3187ce37-9f15-4a93-8978-670bf41a42ca.svg)](https://oosmetrics.com/repo/noVibe/DnsConf)<br>
 [![Last Build](../../actions/workflows/github_action.yml/badge.svg?branch=main)](../../actions/workflows/github_action.yml)<br>
 
 # DNS Block&Redirect Configurer
@@ -35,24 +34,26 @@ values here: [Setup credentials](#setup-credentials)
 
 ## Standard Setup
 
-[Setup credentials](#setup-credentials)
+[Set up credentials](#set-up-credentials)
 
-[Setup profile](#setup-profile)
+[Set up profile](#set-up-profile)
 
-[Setup data sources](#setup-data-sources)
+[Set up data sources](#set-up-data-sources)
 
-[Setup exclude redirects (optional)](#setup-exclude-redirects-optional)
+[Set up exclude redirects (optional)](#set-up-exclude-redirects-optional)
+
+[Set up a DNS donor](#set-up-a-dns-donor)
 
 [Multiple profiles setup](#multiple-profiles-setup)
 
-[GitHub Actions](#github-actions-setup)
+[GitHub Actions setup](#github-actions-setup)
 
 ---
-## Setup credentials
+## Set up credentials
 
 ### NextDNS credentials setup
 
-1) Generate **API KEY**, from https://my.nextdns.io/account and set as **environment variable** `AUTH_SECRET`
+1) Generate an **API KEY** from https://my.nextdns.io/account and set it as an **environment variable** `AUTH_SECRET`
 
 2) Click on **NextDNS** logo. On the opened page, copy ID from Endpoints section.
    Set it as **environment variable** `CLIENT_ID`
@@ -82,13 +83,13 @@ Set **Account ID** to **environment variable** `CLIENT_ID`
 
 ---
 
-## Setup profile
+## Set up profile
 
 Set **environment variable** `DNS` with DNS provider name (**Cloudflare** or **NextDNS**)
 
 ---
 
-## Setup data sources
+## Set up data sources
 
 Each data source must be a link to a hosts file,
 e.g. https://raw.githubusercontent.com/Internet-Helper/GeoHideDNS/refs/heads/main/hosts/hosts
@@ -96,7 +97,7 @@ e.g. https://raw.githubusercontent.com/Internet-Helper/GeoHideDNS/refs/heads/mai
 You can provide multiple sources split by coma:
 https://first.com/hosts,https://second.com/hosts
 
-### 1) Setup Redirects
+### 1) Set up Redirects
 
 Set sources to **environment variable** `REDIRECT`
 
@@ -112,7 +113,7 @@ will keep only `1.2.3.4 domain.to.redirect` for the further redirect processing.
 
 + Redirect priority follows sources order. If domain appears more than one time, the first only IP will be applied.
 
-### 2) Setup Blocklist
+### 2) Set up Blocklist
 
 Set sources to **environment variable** `BLOCK`
 
@@ -140,7 +141,7 @@ for the further block processing.
 
 ---
 
-## Setup exclude redirects (optional)
+## Set up exclude redirects (optional)
 
 Put domains to **environment variable** `EXCLUDE_REDIRECT` separated by coma, e.g. `instagram.com,twitch.com`
 
@@ -148,6 +149,31 @@ These domains and their subdomains:
 
 - will be removed from existing redirect rules;
 - won't be added with new ones.
+
+---
+
+## Set up a DNS donor
+
+If IP addresses of domains are outdated, they can be updated via "donor" DNS. You need:
+1) Create **environment variable** `DONOR_DNS`
+2) Provide the **DNS-provider** that will be used as a **donor**.
+   Use one of the following formats:
+- **IPv4** (e.g. `111.88.96.50`)
+- **DoH** (e.g. `https://xbox-dns.ru/dns-query`)
+
+For instance, if your hosts-file supplies following:
+
+    1.2.3.4 domain-1.to.redirect
+    1.2.3.4 domain-2.to.redirect
+    1.2.3.4 domain-3.to.redirect
+
+Then, a `DONOR_DNS` value will be called for each domain, fetching new IP addresses:
+
+    5.6.7.8 domain-1.to.redirect
+    2.3.4.5 domain-2.to.redirect
+    9.8.7.6 domain-3.to.redirect
+
+Thus, the new IPs will be used for the further redirect rules upload process.
 
 ---
 
@@ -175,7 +201,7 @@ In addition to setting above, list provider for each profile in **environment va
 
 ---
 
-## Script Behaviour
+## Script Behavior
 
 ### Cloudflare
 
@@ -189,7 +215,7 @@ After removing old data, new lists and rules will be generated and applied.
 
 If you want to clear **Cloudflare** block/redirect settings, launch the script without providing sources in related *
 *environment variables**. E.g. providing no value for **environment variable** `BLOCK` will cause removing old related
-data: lists and rules used to setup blocks.
+data: lists and rules used to set up blocks.
 
 ### NextDNS
 
@@ -220,7 +246,7 @@ Previously generated data is removed **ONLY** when both `BLOCK` and `REDIRECT` s
 4) Provide `AUTH_SECRET` and `CLIENT_ID` to **Environment secrets**
 5) Provide `DNS`,`REDIRECT`, `BLOCK` and `EXCLUDE_REDIRECT` to **Environment variables**
 
-+ The action will be launched every day at **01:30 UTC**. To set another time, change cron at
++ The action will be executed every day at **01:30 UTC**. To set another time, change cron at
   `.github/workflows/github_action.yml`
 + You can run the action manually via `Run workflow` button: switch to _Actions_ tab and choose workflow named **DNS
   Block&Redirect Configurer cron task**
