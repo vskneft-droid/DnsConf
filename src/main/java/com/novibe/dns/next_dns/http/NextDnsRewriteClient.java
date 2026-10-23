@@ -12,18 +12,26 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class NextDnsRewriteClient extends AbstractNextDnsHttpClient {
+public class NextDnsRewriteClient extends AbstractNextDnsApiClient {
 
     public List<RewriteDto> fetchRewrites() {
         return get(path(), MultiRewriteResponse.class)
                 .getData();
     }
 
-    public SingleRewriteResponse saveRewrite(CreateRewriteDto rewriteDto) {
+    public void saveRewrites(List<CreateRewriteDto> rewriteDtos) {
+        callApiForEach(rewriteDtos, this::saveRewrite);
+    }
+
+    public void deleteRewritesByIds(List<String> ids) {
+        callApiForEach(ids, this::deleteRewriteById);
+    }
+
+    private SingleRewriteResponse saveRewrite(CreateRewriteDto rewriteDto) {
         return post(path(), rewriteDto, SingleRewriteResponse.class);
     }
 
-    public @Nullable SingleRewriteResponse deleteRewriteById(String id) {
+    private @Nullable SingleRewriteResponse deleteRewriteById(String id) {
         return delete(path() + "/" + id, SingleRewriteResponse.class);
     }
 
